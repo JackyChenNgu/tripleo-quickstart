@@ -1,0 +1,48 @@
+#openstack release [ocata pike queens rocky]
+release: rocky
+
+#overcloud undercloud images
+overcloud_image_url: http://10.200.2.160/overcloud-full.tar 
+ipa_image_url: http://10.200.2.160/ironic-python-agent.tar
+
+#repo
+repos:
+  - type: generic
+    reponame: delorean
+    filename: delorean.repo
+    baseurl: https://trunk.rdoproject.org/centos7-rocky/current-tripleo/
+    priority: 20
+
+#set password for undercloud and overcloud
+modify_image_vc_root_password: 123456
+overcloud_full_root_pwd: 123456
+
+#docker images parameters
+#private_registry_ip: 10.200.2.160
+#registry_port: 8787
+undercloud_docker_insecure_registries: 10.200.2.160:8787
+#local_docker_registry_host: "{{ undercloud_network_cidr|nthhost(1) }}"
+additional_insecure_registry: false
+docker_registry_host: 10.200.2.160:8787
+docker_registry_namespace: "tripleo{{ release }}"
+docker_image_tag: current-tripleo-rdo
+#docker prefix
+docker_prep_prefix: "{{ ansible_distribution | lower }}-binary-"
+docker_prep_suffix: ""
+docker_ceph_namespace: 10.200.2.160:8787/ceph
+docker_ceph_image: daemon
+docker_ceph_tag: >-
+  {% if release in ['pike'] -%}
+  v3.0.3-stable-3.0-jewel-centos-7-x86_64
+  {% elif release in ['rocky'] -%}
+  latest
+  {%- else -%}
+  v3.2.1-stable-3.2-luminous-centos-7-x86_64
+  {%- endif -%}
+# Args of overcloud HA deploy
+ntp_server: 0.cn.pool.ntp.org
+
+#undercloud vm
+undercloud_memory: 20480
+undercloud_disk: 200
+undercloud_vcpu: 10
